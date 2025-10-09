@@ -74,7 +74,6 @@ function IssueAnalysis() {
             >
               Solution
             </ToggleGroupItem>
-            <ToggleGroupItem value="history">Query History</ToggleGroupItem>
           </ToggleGroup>
         </div>
         <div className="h-auto  bg-gray-100 w-full rounded-xl my-5 drop-shadow-xl flex flex-col justify-between items-center">
