@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import axios from "axios";
-import Markdown from "react-markdown";
 
 function IssueAnalysis() {
   const [userError, setUserError] = useState("");
@@ -39,10 +38,17 @@ function IssueAnalysis() {
       e.preventDefault();
       try {
         setAnalysing(true);
+        // const res = await axios.post(
+        //   "https://issuelens-backend.onrender.com/analyseIssue",
+        //   {
+        //     userError,
+        //   }
+        // );
         const res = await axios.post("http://localhost:8000/analyseIssue", {
           userError,
         });
-        // setResponse(res.data.output);
+        console.log(res.data.output);
+        setResponse(res.data.output);
         splitRagResponse(res.data.output);
         setAnalysing(false);
         setActiveTab("solution");
@@ -99,6 +105,9 @@ function IssueAnalysis() {
           )}
           {activeTab === "solution" && (
             <div className="w-[90%] my-5 flex flex-col gap-3">
+              <pre className="prose bg-blue-50 border-2 border-blue-300 prose-blue w-full max-h-[250px] p-3 rounded-lg shadow overflow-auto">
+                {response ? <pre className="text-xs">{response}</pre> : null}
+              </pre>
               <div className="mt-2">What happened in Appwrite?</div>
               <pre className="prose bg-blue-50 border-2 border-blue-300 prose-blue w-full max-h-[250px] p-3 rounded-lg shadow overflow-auto">
                 {response ? (
