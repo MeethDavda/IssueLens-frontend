@@ -20,20 +20,23 @@ function IssueAnalysis() {
       /(?:^|\n)(?:###?\s*)?What to do[:\s]*([\s\S]*)/i
     );
 
-    const partedResponse = {
-      happened: happenedMatch ? happenedMatch[1].trim() : "",
-      fix: fixMatch ? fixMatch[1].trim() : "",
-      todo: todoMatch ? todoMatch[1].trim() : "",
-    };
+    // Extract parts if available
+    const happened = happenedMatch ? happenedMatch[1].trim() : "";
+    const fix = fixMatch ? fixMatch[1].trim() : "";
+    const todo = todoMatch ? todoMatch[1].trim() : "";
+
+    // If none of the sections exist, store as a generic response
+    const partedResponse =
+      !happened && !fix && !todo
+        ? { genericResponse: responseText.trim() }
+        : { happened, fix, todo };
+
+    // Update your state
     setResponse(partedResponse);
-    return {
-      happened: happenedMatch ? happenedMatch[1].trim() : "",
-      fix: fixMatch ? fixMatch[1].trim() : "",
-      todo: todoMatch ? todoMatch[1].trim() : "",
-    };
   }
 
-  async function handleClick(e) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function handleClick(e: any) {
     if (!analysing) {
       e.preventDefault();
       try {
@@ -65,12 +68,14 @@ function IssueAnalysis() {
             <ToggleGroupItem
               value="analyse"
               onClick={() => setActiveTab("analyse")}
+              className="p-5"
             >
               Analyse Issue
             </ToggleGroupItem>
             <ToggleGroupItem
               value="solution"
               onClick={() => setActiveTab("solution")}
+              className="p-5"
             >
               Solution
             </ToggleGroupItem>
@@ -104,27 +109,32 @@ function IssueAnalysis() {
           )}
           {activeTab === "solution" && (
             <div className="w-[90%] my-5 flex flex-col gap-3">
-              <pre className="prose bg-blue-50 border-2 border-blue-300 prose-blue w-full max-h-[250px] p-3 rounded-lg shadow overflow-auto">
-                {response ? <pre className="text-xs">{response}</pre> : null}
-              </pre>
-              <div className="mt-2">What happened in Appwrite?</div>
-              <pre className="prose bg-blue-50 border-2 border-blue-300 prose-blue w-full max-h-[250px] p-3 rounded-lg shadow overflow-auto">
-                {response ? (
-                  <pre className="text-xs">{response?.happened}</pre>
-                ) : null}
-              </pre>
-              <div className="mt-2">The Fix:</div>
-              <pre className="prose prose-blue w-full max-h-[250px]  bg-blue-50 border-2 border-blue-300 p-3 rounded-lg shadow overflow-auto">
-                {response ? (
-                  <pre className="text-xs">{response?.fix}</pre>
-                ) : null}
-              </pre>
-              <div className="mt-2">What to do?</div>
-              <pre className="prose prose-blue w-full max-h-[250px]  bg-blue-50 border-2 border-blue-300 p-3 rounded-lg shadow overflow-auto">
-                {response ? (
-                  <pre className="text-xs">{response?.todo}</pre>
-                ) : null}
-              </pre>
+              {response?.genericResponse ? (
+                <pre className="prose bg-blue-50 border-2 border-blue-300 prose-blue w-full max-h-[250px] p-3 rounded-lg shadow overflow-auto">
+                  <pre className="text-xs">{response?.genericResponse}</pre>
+                </pre>
+              ) : (
+                <>
+                  <div className="mt-2">What happened in Appwrite?</div>
+                  {response ? (
+                    <pre className="prose bg-blue-50 border-2 border-blue-300 prose-blue w-full max-h-[250px] p-3 rounded-lg shadow overflow-auto">
+                      <pre className="text-xs">{response?.happened}</pre>
+                    </pre>
+                  ) : null}
+                  <div className="mt-2">The Fix:</div>
+                  {response ? (
+                    <pre className="prose prose-blue w-full max-h-[250px]  bg-blue-50 border-2 border-blue-300 p-3 rounded-lg shadow overflow-auto">
+                      <pre className="text-xs">{response?.fix}</pre>
+                    </pre>
+                  ) : null}
+                  <div className="mt-2">What to do?</div>
+                  {response ? (
+                    <pre className="prose prose-blue w-full max-h-[250px]  bg-blue-50 border-2 border-blue-300 p-3 rounded-lg shadow overflow-auto">
+                      <pre className="text-xs">{response?.todo}</pre>
+                    </pre>
+                  ) : null}
+                </>
+              )}
             </div>
           )}
         </div>
