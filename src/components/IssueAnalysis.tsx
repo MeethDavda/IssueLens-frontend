@@ -2,12 +2,14 @@
 import React, { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import axios from "axios";
+import { toast } from "sonner";
 
 function IssueAnalysis() {
   const [userError, setUserError] = useState("");
   const [response, setResponse] = useState({});
   const [activeTab, setActiveTab] = useState("analyse");
   const [analysing, setAnalysing] = useState(false);
+  const [rateLimit, setRateLimit] = useState(false);
 
   function splitRagResponse(responseText: string) {
     const happenedMatch = responseText.match(
@@ -37,7 +39,7 @@ function IssueAnalysis() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function handleClick(e: any) {
-    if (!analysing) {
+    if (!analysing || rateLimit) {
       e.preventDefault();
       try {
         setAnalysing(true);
@@ -47,6 +49,7 @@ function IssueAnalysis() {
         //     userError,
         //   }
         // );
+
         const res = await axios.post("http://localhost:8000/analyseIssue", {
           userError,
         });
@@ -56,6 +59,14 @@ function IssueAnalysis() {
         setAnalysing(false);
         setActiveTab("solution");
       } catch (error) {
+        if (error?.status === 429) {
+          toast.error("You have reached the limit !", {
+            description: "Please try again after 12 hours",
+            position: "top-center",
+          });
+          setRateLimit(true);
+          setAnalysing(false);
+        }
         console.log(error);
       }
     }
@@ -64,18 +75,30 @@ function IssueAnalysis() {
     <div className="flex flex-col content-center items-center my-5">
       <div className="mx-5 lg:w-[50%] flex jusify-center items-center flex-col">
         <div className="mt-7">
-          <ToggleGroup type="single" variant="outline" size={"lg"}>
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            size={"lg"}
+            value={activeTab}
+            onValueChange={(val) => {
+              if (val) setActiveTab(val);
+            }}
+          >
             <ToggleGroupItem
               value="analyse"
               onClick={() => setActiveTab("analyse")}
-              className="p-5"
+              className={`p-5 ${
+                activeTab === "analyse" ? "data-[state=on]:bg-blue-100" : null
+              }  cursor-pointer`}
             >
               Analyse Issue
             </ToggleGroupItem>
             <ToggleGroupItem
               value="solution"
               onClick={() => setActiveTab("solution")}
-              className="p-5"
+              className={`p-5 ${
+                activeTab === "solution" ? "data-[state=on]:bg-blue-100" : null
+              }  cursor-pointer`}
             >
               Solution
             </ToggleGroupItem>
@@ -92,13 +115,13 @@ function IssueAnalysis() {
                 Example:
                 TypeError: Cannot read property 'map' of undefined
                 ReferenceError: document is not defined`}
-                className="w-full bg-blue-50 border-2 border-blue-300 rounded-md mt-5 font-extralight text-gray-600 h-[200px] p-2"
+                className="w-full bg-blue-50 border-2 border-blue-30 rounded-md mt-5 p-2 font-extralight text-gray-600 h-[200px] drop-shadow-xl"
                 onChange={(e) => {
                   setUserError(e.target.value);
                 }}
               ></textarea>
               <div
-                className={`w-full bg-blue-100 rounded-md p-3 mt-5 border-2 border-blue-300 flex justify-center items-center ${
+                className={`w-full bg-blue-100 drop-shadow-md rounded-md p-3 mt-5 border-2 border-blue-30 flex justify-center items-center ${
                   analysing ? "cursor-not-allowed" : "cursor-pointer"
                 } hover:p-5 hover:tracking-widest transition-all ease-in-out duration-200`}
                 onClick={handleClick}
@@ -108,7 +131,7 @@ function IssueAnalysis() {
             </div>
           )}
           {activeTab === "solution" && (
-            <div className="w-[90%] my-5 flex flex-col gap-3">
+            <div className="w-[90%] my-5 flex flex-col gap-3 drop-shadow-xl">
               {response?.genericResponse ? (
                 <pre className="prose bg-blue-50 border-2 border-blue-300 prose-blue w-full max-h-[250px] p-3 rounded-lg shadow overflow-auto">
                   <pre className="text-xs">{response?.genericResponse}</pre>
