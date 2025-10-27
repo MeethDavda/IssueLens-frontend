@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IssueLens
 
-## Getting Started
+IssueLens is an AI-powered debugging assistant designed to help developers quickly resolve Appwrite related errors. It uses Retrieval Augmented Generation (RAG) to search through 9K+ Appwrite GitHub issues and comments, returning structured explanations and actionable fixes in seconds.
 
-First, run the development server:
+## Live Demo
+https://issuelens-frontend.appwrite.network/
 
-```bash
+---
+
+## Features
+
+- Smart error analysis and context-aware search through GitHub issues
+- Markdown formatted explanations with code snippets
+- Actionable, step-by-step fixes for Appwrite issues
+- Developer focused UI with clean structure
+- Daily usage limits (5 free analyses every 12 hours)
+- Fully responsive and mobile friendly design
+
+---
+
+## How It Works
+
+1. The user submits an Appwrite related error message
+2. The backend embeds and queries relevant GitHub issues using OpenAI vector search
+3. Results are ranked and summarized into:
+   - What happened in Appwrite
+   - Fix
+   - What to do next
+4. Response is returned as structured Markdown
+
+This significantly reduces the need to manually search issue threads.
+
+---
+
+## Architecture
+
+| Component | Technology |
+|----------|------------|
+| Frontend | Next.js 15, React 19, Tailwind CSS |
+| Backend | Node.js + Express |
+| Database | Appwrite Database |
+| Vector Search | OpenAI Vector Store |
+| AI Models | OpenAI Assistants API |
+| Deployment | Appwrite Sites |
+
+---
+
+## Appwrite Integration
+
+| Appwrite Feature | Usage |
+|-----------------|------|
+| Appwrite Sites | Hosting static frontend |
+| Appwrite Database | Track quotas using hashed fingerprints |
+| OpenAI Vector Store | Store and query embeddings of GitHub issues |
+| Node Appwrite SDK | Secure communication with backend |
+
+---
+
+## Rate Limiting
+
+IssueLens provides 5 free queries every 12 hours. Query limits are enforced via:
+
+- Hashed client fingerprints (derived from IP + headers)
+- Server-stored quota values in Appwrite Database
+- Automatic quota reset after expiration
+
+Local storage is only used for display purposes; the server is the source of truth.
+
+---
+
+## Development
+
+### Prerequisites
+
+- Node.js 18+
+- Appwrite project with:
+  - Database ID and Table configured
+  - Vector store populated with GitHub issue embeddings
+- `.env` file containing:
+  - `OPENAI_API_KEY`
+  - `APPWRITE_API_KEY`
+  - `PROJECT_ID`
+  - `DATABASE_ID`
+
+### Setup
+
+```sh
+git clone https://github.com/MeethDavda/IssueLens-frontend.git
+cd IssueLens-frontend
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
