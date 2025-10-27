@@ -8,7 +8,7 @@ import ProductInfo from "./ProductInfo";
 
 function IssueAnalysis() {
   const [userError, setUserError] = useState("");
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState<any>();
   const [activeTab, setActiveTab] = useState("analyse");
   const [analysing, setAnalysing] = useState(false);
   const [rateLimit, setRateLimit] = useState(false);
