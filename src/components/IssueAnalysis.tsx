@@ -13,20 +13,18 @@ function IssueAnalysis() {
   const [analysing, setAnalysing] = useState(false);
   const [rateLimit, setRateLimit] = useState(false);
   const [queryLimit, setQueryLimit] = useState<number>();
-  const { timeDiff, resetTime } = useGetTime();
+  const { timeDiff, resetTime, remainingQueries } = useGetTime();
   const hours = Math.floor(timeDiff / (1000 * 60 * 60));
   const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
 
-  useEffect(
-    function checkLimit() {
-      if (typeof window !== "undefined") {
-        if (localStorage.getItem("queries")) {
-          setQueryLimit(Number(localStorage.getItem("queries")));
-        }
-      }
-    },
-    [queryLimit]
-  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const stored = localStorage.getItem("queries");
+    if (stored !== null) {
+      setQueryLimit(Number(stored));
+    }
+  }, []);
 
   function handleQueryLimit() {
     if (queryLimit) {
