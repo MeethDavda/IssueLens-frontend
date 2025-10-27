@@ -4,8 +4,9 @@
 @custom-variant dark (&:is(.dark *));
 
 body {
-  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  /* font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif; */
+  font-family: "Geist Mono", monospace;
 }
 
 @theme inline {

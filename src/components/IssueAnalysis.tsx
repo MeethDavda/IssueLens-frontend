@@ -1,8 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import axios from "axios";
 import { toast } from "sonner";
+import useGetTime from "@/utils/getTime";
+import ProductInfo from "./ProductInfo";
 
 function IssueAnalysis() {
   const [userError, setUserError] = useState("");
@@ -10,6 +12,35 @@ function IssueAnalysis() {
   const [activeTab, setActiveTab] = useState("analyse");
   const [analysing, setAnalysing] = useState(false);
   const [rateLimit, setRateLimit] = useState(false);
+  const [queryLimit, setQueryLimit] = useState<number>();
+  const { timeDiff, resetTime } = useGetTime();
+  const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+  const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+  useEffect(
+    function checkLimit() {
+      if (typeof window !== "undefined") {
+        if (localStorage.getItem("queries")) {
+          setQueryLimit(Number(localStorage.getItem("queries")));
+        }
+      }
+    },
+    [queryLimit]
+  );
+
+  function handleQueryLimit() {
+    if (queryLimit) {
+      if (queryLimit <= 0) {
+        setRateLimit(true);
+        setAnalysing(false);
+      }
+    }
+    if (localStorage.getItem("queries")) {
+      const newLimit = Number(localStorage.getItem("queries")) - 1;
+      localStorage.setItem("queries", newLimit.toString());
+      setQueryLimit(newLimit);
+    }
+  }
 
   function splitRagResponse(responseText: string) {
     const happenedMatch = responseText.match(
@@ -43,17 +74,19 @@ function IssueAnalysis() {
       e.preventDefault();
       try {
         setAnalysing(true);
-        // const res = await axios.post(
-        //   "https://issuelens-backend.onrender.com/analyseIssue",
-        //   {
-        //     userError,
-        //   }
-        // );
+        const res = await axios.post(
+          "https://issuelens-backend.onrender.com/analyseIssue",
+          {
+            userError,
+            resetTime,
+          }
+        );
 
-        const res = await axios.post("http://localhost:8000/analyseIssue", {
-          userError,
-        });
-        console.log(res.data.output);
+        // const res = await axios.post("http://localhost:8000/analyseIssue", {
+        //   userError,
+        //   resetTime,
+        // });
+        handleQueryLimit();
         setResponse(res.data.output);
         splitRagResponse(res.data.output);
         setAnalysing(false);
@@ -61,7 +94,7 @@ function IssueAnalysis() {
       } catch (error) {
         if (error?.status === 429) {
           toast.error("You have reached the limit !", {
-            description: "Please try again after 12 hours",
+            description: `Please try again after ${hours}h ${minutes}m`,
             position: "top-center",
           });
           setRateLimit(true);
@@ -73,6 +106,7 @@ function IssueAnalysis() {
   }
   return (
     <div className="flex flex-col content-center items-center my-5">
+      <ProductInfo hours={hours} minutes={minutes} queryLimit={queryLimit} />
       <div className="mx-5 lg:w-[50%] flex jusify-center items-center flex-col">
         <div className="mt-7">
           <ToggleGroup
@@ -115,7 +149,7 @@ function IssueAnalysis() {
                 Example:
                 TypeError: Cannot read property 'map' of undefined
                 ReferenceError: document is not defined`}
-                className="w-full bg-blue-50 border-2 border-blue-30 rounded-md mt-5 p-2 font-extralight text-gray-600 h-[200px] drop-shadow-xl"
+                className="w-full bg-blue-50 text-sm border-2 border-blue-30 rounded-md mt-5 p-2 font-extralight text-gray-600 h-[200px] drop-shadow-md"
                 onChange={(e) => {
                   setUserError(e.target.value);
                 }}

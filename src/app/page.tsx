@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="">
       <Navbar />
-      <ProductInfo />
+      {/* <ProductInfo /> */}
       <IssueAnalysis />
     </div>
   );
