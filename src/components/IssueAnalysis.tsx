@@ -17,14 +17,13 @@ function IssueAnalysis() {
   const hours = Math.floor(timeDiff / (1000 * 60 * 60));
   const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
 
+  console.log(remainingQueries, "ehlo");
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const stored = localStorage.getItem("queries");
-    if (stored !== null) {
-      setQueryLimit(Number(stored));
+    if (remainingQueries !== undefined && remainingQueries !== null) {
+      localStorage.setItem("queries", String(remainingQueries));
+      setQueryLimit(remainingQueries);
     }
-  }, []);
+  }, [remainingQueries]);
 
   function handleQueryLimit() {
     if (queryLimit) {

@@ -17,12 +17,6 @@ function useGetTime() {
         setTimeDiff(response.data.resBody.resetTime - now.getTime());
         setResetTime(response.data.resBody.resetTime);
         setRemainingQueries(response.data.resBody.remaining_queries);
-        if (window !== undefined) {
-          localStorage.setItem(
-            "queries",
-            response.data.resBody.remaining_queries
-          );
-        }
       } catch (error) {
         console.log(error);
       }
