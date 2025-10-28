@@ -5,6 +5,8 @@ import axios from "axios";
 import { toast } from "sonner";
 import useGetTime from "@/utils/getTime";
 import ProductInfo from "./ProductInfo";
+import { div } from "motion/react-client";
+import { Spinner } from "./ui/spinner";
 
 function IssueAnalysis() {
   const [userError, setUserError] = useState("");
@@ -12,6 +14,7 @@ function IssueAnalysis() {
   const [activeTab, setActiveTab] = useState("analyse");
   const [analysing, setAnalysing] = useState(false);
   const [rateLimit, setRateLimit] = useState(false);
+  const [fetchTime, setFetchTime] = useState(true);
   const [queryLimit, setQueryLimit] = useState<number>();
   const { timeDiff, resetTime, remainingQueries } = useGetTime();
   const hours = Math.floor(timeDiff / (1000 * 60 * 60));
@@ -22,6 +25,7 @@ function IssueAnalysis() {
     if (remainingQueries !== undefined && remainingQueries !== null) {
       localStorage.setItem("queries", String(remainingQueries));
       setQueryLimit(remainingQueries);
+      setFetchTime(false);
     }
   }, [remainingQueries]);
 
@@ -103,7 +107,12 @@ function IssueAnalysis() {
   }
   return (
     <div className="flex flex-col content-center items-center my-5">
-      <ProductInfo hours={hours} minutes={minutes} queryLimit={queryLimit} />
+      <ProductInfo
+        hours={hours}
+        minutes={minutes}
+        queryLimit={queryLimit}
+        fetchTime={fetchTime}
+      />
       <div className="mx-5 lg:w-[50%] flex jusify-center items-center flex-col">
         <div className="mt-7">
           <ToggleGroup
@@ -157,7 +166,14 @@ function IssueAnalysis() {
                 } hover:p-5 hover:tracking-widest transition-all ease-in-out duration-200`}
                 onClick={handleClick}
               >
-                <div>{analysing ? "Analysing..." : "Analyse"}</div>
+                {/* <div>{analysing ? "Analysing..." : "Analyse"}</div> */}
+                {analysing ? (
+                  <div className="flex flex-row gap-2 items-center">
+                    <Spinner className="size-5 text-blue-500" /> Analysing
+                  </div>
+                ) : (
+                  <div>Analyse</div>
+                )}
               </div>
             </div>
           )}

@@ -1,20 +1,12 @@
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "IssueLens",
   description: "Find fixes in GitHub issues instantly",
   icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-    ],
-    apple: {
-      url: "/favicon-180x180.png",
-      sizes: "180x180",
-      type: "image/png",
-    },
+    icon: "/icon.ico",
   },
 };
 

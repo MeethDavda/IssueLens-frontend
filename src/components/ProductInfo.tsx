@@ -2,8 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { WordRotate } from "./ui/word-rotate";
 import useGetTime from "@/utils/getTime";
+import { span } from "motion/react-client";
+import { Spinner } from "./ui/spinner";
 
-function ProductInfo({ hours, minutes, queryLimit }) {
+function ProductInfo({ hours, minutes, queryLimit, fetchTime }) {
   // const hours = Math.floor(Number(timeDiff) / (1000 * 60 * 60));
   // const minutes = Math.floor(
   //   (Number(timeDiff) % (1000 * 60 * 60)) / (1000 * 60)
@@ -24,11 +26,19 @@ function ProductInfo({ hours, minutes, queryLimit }) {
           duration={2000}
           words={["// No endless scrolling", "// No noise", "// Just the fix"]}
         />
-        <div className="text-sm  text-gray-400">
-          Daily limit resets in {hours}h {minutes}m
+        <div className="text-sm  text-gray-400 flex flex-row gap-2 items-center">
+          Daily limit resets in
+          {fetchTime ? (
+            <Spinner />
+          ) : (
+            <span>
+              {hours}h {minutes}m
+            </span>
+          )}
         </div>
-        <div className="text-sm  text-gray-400">
-          Remaining Queries: {queryLimit}
+        <div className="text-sm  text-gray-400 flex flex-row gap-2 items-cente">
+          Remaining Queries:
+          {fetchTime ? <Spinner /> : <span>{queryLimit}</span>}
         </div>
       </div>
     </div>
